@@ -1,0 +1,36 @@
+# Sudoers pour le compte de déploiement rxpress-deploy
+# Installer sur le serveur Hestia :
+#   sudo visudo -f /etc/sudoers.d/rxpress-deploy
+# Vérifier la syntaxe avant d'appliquer :
+#   sudo visudo -c -f /etc/sudoers.d/rxpress-deploy
+
+Defaults:rxpress-deploy !requiretty
+
+# Hestia CLI — uniquement les commandes utilisées par le dashboard
+rxpress-deploy ALL=(root) NOPASSWD: /usr/local/hestia/bin/v-add-user
+rxpress-deploy ALL=(root) NOPASSWD: /usr/local/hestia/bin/v-change-user-password
+rxpress-deploy ALL=(root) NOPASSWD: /usr/local/hestia/bin/v-add-web-domain
+rxpress-deploy ALL=(root) NOPASSWD: /usr/local/hestia/bin/v-rebuild-web-domain
+rxpress-deploy ALL=(root) NOPASSWD: /usr/local/hestia/bin/v-add-web-domain-ssl
+rxpress-deploy ALL=(root) NOPASSWD: /usr/local/hestia/bin/v-add-web-domain-ssl-force
+rxpress-deploy ALL=(root) NOPASSWD: /usr/local/hestia/bin/v-add-database
+rxpress-deploy ALL=(root) NOPASSWD: /usr/local/hestia/bin/v-change-database-password
+rxpress-deploy ALL=(root) NOPASSWD: /usr/local/hestia/bin/v-restart-web
+rxpress-deploy ALL=(root) NOPASSWD: /usr/local/hestia/bin/v-delete-domain
+rxpress-deploy ALL=(root) NOPASSWD: /usr/local/hestia/bin/v-suspend-web-domain
+rxpress-deploy ALL=(root) NOPASSWD: /usr/local/hestia/bin/v-unsuspend-web-domain
+rxpress-deploy ALL=(root) NOPASSWD: /usr/local/hestia/bin/v-list-web-domains
+
+# WP-CLI exécuté en tant que l'utilisateur Hestia du site (sudo -u <hestia_user>)
+# Le wildcard ici est inévitable car le user varie par site.
+# Le risque est limité : wp-cli est confiné au public_html du site concerné.
+rxpress-deploy ALL=(ALL, !root) NOPASSWD: /usr/local/bin/wp *
+
+# Nettoyage de fichiers temporaires créés par le dashboard
+rxpress-deploy ALL=(root) NOPASSWD: /bin/rm -f /tmp/rxwc_*
+rxpress-deploy ALL=(root) NOPASSWD: /bin/rm -f /tmp/rwp_config_*
+rxpress-deploy ALL=(root) NOPASSWD: /bin/rm -rf /tmp/ssl_*
+
+# Copie des certificats wildcard (addWebDomainSsl)
+rxpress-deploy ALL=(root) NOPASSWD: /bin/cp /usr/local/hestia/ssl/* /tmp/ssl_*
+rxpress-deploy ALL=(root) NOPASSWD: /bin/mkdir -p /tmp/ssl_*
