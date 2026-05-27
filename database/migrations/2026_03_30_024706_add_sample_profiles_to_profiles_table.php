@@ -10,24 +10,25 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        // Ajout de profils exemples
-        DB::table('profiles')->insert([
-            [
-                'user_id' => 1,
-                'phone' => '+33612345678',
-                'avatar' => null,
-                'bio' => 'Développeuse web passionnée',
-                'address' => '12 rue de Paris',
-                'city' => 'Paris',
-                'country' => 'France',
-                'postal_code' => '75001',
-                'company' => 'WebTech',
-                'website' => 'https://alice.dev',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-
-        ]);
+        // Données exemples — uniquement si l'user 1 existe (dev local)
+        if (DB::table('users')->where('id', 1)->exists()) {
+            DB::table('profiles')->insertOrIgnore([
+                [
+                    'user_id' => 1,
+                    'phone' => '+33612345678',
+                    'avatar' => null,
+                    'bio' => 'Développeuse web passionnée',
+                    'address' => '12 rue de Paris',
+                    'city' => 'Paris',
+                    'country' => 'France',
+                    'postal_code' => '75001',
+                    'company' => 'WebTech',
+                    'website' => 'https://alice.dev',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+            ]);
+        }
     }
 
     /**
