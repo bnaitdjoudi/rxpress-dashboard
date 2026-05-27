@@ -8,12 +8,26 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::table('site_hooks', function (Blueprint $table) {
-            // site_id foreign key already created in create_site_hooks_table
-            $existingFKs = collect(DB::select("SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS
-                WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'site_hooks' AND CONSTRAINT_TYPE = 'FOREIGN KEY'"))
-                ->pluck('CONSTRAINT_NAME')->toArray();
+        // 1. Add hook_id column if missing, drop old hook string column
+        if (!Schema::hasColumn('site_hooks', 'hook_id')) {
+            Schema::table('site_hooks', function (Blueprint $table) {
+                $table->unsignedBigInteger('hook_id')->nullable()->after('site_id');
+            });
+        }
 
+        if (Schema::hasColumn('site_hooks', 'hook')) {
+            Schema::table('site_hooks', function (Blueprint $table) {
+                $table->dropUnique(['site_id', 'hook']);
+                $table->dropColumn('hook');
+            });
+        }
+
+        // 2. Add FK constraints and unique index if not already present
+        $existingFKs = collect(DB::select("SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS
+            WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'site_hooks' AND CONSTRAINT_TYPE = 'FOREIGN KEY'"))
+            ->pluck('CONSTRAINT_NAME')->toArray();
+
+        Schema::table('site_hooks', function (Blueprint $table) use ($existingFKs) {
             if (!in_array('site_hooks_site_id_foreign', $existingFKs)) {
                 $table->foreign('site_id')->references('id')->on('sites')->cascadeOnDelete();
             }
@@ -21,8 +35,8 @@ return new class extends Migration {
                 $table->foreign('hook_id')->references('id')->on('hooks')->cascadeOnDelete();
             }
 
-            $existingIndexes = collect(DB::select("SHOW INDEX FROM site_hooks WHERE Key_name = 'site_hooks_site_id_hook_id_unique'"));
-            if ($existingIndexes->isEmpty()) {
+            $hasUnique = collect(DB::select("SHOW INDEX FROM site_hooks WHERE Key_name = 'site_hooks_site_id_hook_id_unique'"))->isNotEmpty();
+            if (!$hasUnique) {
                 $table->unique(['site_id', 'hook_id']);
             }
         });
