@@ -7,12 +7,15 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Dev-only cleanup — skip on fresh installs where tables are already empty
+        if (DB::table('sites')->count() === 0) {
+            return;
+        }
+
         DB::table('sites')->delete();
 
-        // Remettre à zéro le compteur de sites dans sub_usage_options
         DB::table('sub_usage_options')
-            ->whereHas('planUsageOptionLimit', fn($q) => $q->where('limit_name', 'site'))
-            ->orWhereIn('plan_usage_option_limit_id', function ($q) {
+            ->whereIn('plan_usage_option_limit_id', function ($q) {
                 $q->select('id')->from('plan_usage_option_limits')->where('limit_name', 'site');
             })
             ->update(['used' => 0]);
