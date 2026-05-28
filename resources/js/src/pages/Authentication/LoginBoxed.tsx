@@ -109,7 +109,7 @@ const LoginBoxed = () => {
                     <p className="text-sm text-slate-400">
                         Don't have an account?{' '}
                         <a
-                            href={`${import.meta.env.VITE_SAAS_URL}/sign-up`}
+                            href={`${import.meta.env.VITE_SAAS_URL}/#pricing`}
                             className="font-medium text-cyan-400 hover:text-cyan-300 transition-colors"
                         >
                             Sign up
