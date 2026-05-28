@@ -9,7 +9,7 @@
 
     <title>rxpress Dashboard</title>
 
-    <link rel="shortcut icon" href="{{ asset('favicon.png') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
 
     <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700" rel="stylesheet">
 

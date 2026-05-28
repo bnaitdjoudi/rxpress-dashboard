@@ -24,80 +24,90 @@ const LoginBoxed = () => {
             await authApi.login(email, password);
             navigate('/');
         } catch (err: any) {
-            setError(err.message || err.errors?.email?.[0] || 'Erreur de connexion');
+            setError(err.message || err.errors?.email?.[0] || 'Login failed');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex justify-center">
-                    <img src="/assets/images/logo.svg" alt="RxPress" className="h-12 w-auto" />
-                </div>
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    Sign in to your account
-                </h2>
+        <div className="relative min-h-screen bg-slate-950 flex items-center justify-center px-4 antialiased overflow-hidden">
+            {/* Ambient blobs */}
+            <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+                <div className="absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-cyan-500/15 blur-3xl" />
+                <div className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-orange-500/10 blur-3xl" />
+                <div className="absolute left-0 top-1/3 h-64 w-64 rounded-full bg-sky-500/10 blur-3xl" />
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <form className="space-y-6" onSubmit={submitForm}>
-                    {error && (
-                        <div className="text-red-500 text-sm text-center">{error}</div>
-                    )}
-                    <div>
-                        <label htmlFor="Email" className="block text-sm font-medium text-gray-700">
-                            Email
-                        </label>
-                        <div className="mt-1">
+            <div className="w-full max-w-sm">
+                {/* Logo */}
+                <div className="mb-8 text-center">
+                    <a href="/" className="inline-block text-2xl font-bold tracking-tight text-white">
+                        <span className="text-cyan-400">RX</span>press
+                    </a>
+                    <p className="mt-2 text-sm text-slate-400">Sign in to your account</p>
+                </div>
+
+                {/* Card */}
+                <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-8 shadow-xl shadow-black/30">
+                    <form className="space-y-5" onSubmit={submitForm}>
+                        {error && (
+                            <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
+                                {error}
+                            </div>
+                        )}
+
+                        <div>
+                            <label htmlFor="Email" className="block text-sm font-medium text-slate-300 mb-1.5">
+                                Email
+                            </label>
                             <input
                                 id="Email"
                                 type="email"
                                 autoComplete="email"
-                                placeholder="Enter your email"
+                                placeholder="you@example.com"
                                 required
                                 maxLength={50}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                                className="w-full rounded-full bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors"
                             />
                         </div>
-                    </div>
 
-                    <div>
-                        <label htmlFor="Password" className="block text-sm font-medium text-gray-700">
-                            Password
-                        </label>
-                        <div className="mt-1">
+                        <div>
+                            <label htmlFor="Password" className="block text-sm font-medium text-slate-300 mb-1.5">
+                                Password
+                            </label>
                             <input
                                 id="Password"
                                 type="password"
                                 autoComplete="current-password"
-                                placeholder="Enter your password"
+                                placeholder="••••••••"
                                 required
                                 minLength={8}
                                 maxLength={100}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                                className="w-full rounded-full bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors"
                             />
                         </div>
-                    </div>
 
-                    <div>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-60"
+                            className="mt-2 w-full flex items-center justify-center gap-2 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-sm py-2.5 px-4 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                             {loading && (
-                                <span className="animate-spin border-2 border-white border-l-transparent rounded-full w-4 h-4 inline-block mr-2" />
+                                <span className="w-4 h-4 rounded-full border-2 border-slate-900 border-t-transparent animate-spin" />
                             )}
-                            {loading ? 'Signing in...' : 'Sign in'}
+                            {loading ? 'Signing in…' : 'Sign in'}
                         </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
+
+                <p className="mt-6 text-center text-xs text-slate-500">
+                    © {new Date().getFullYear()} RXpress — Webhook reliability for WordPress
+                </p>
             </div>
         </div>
     );
