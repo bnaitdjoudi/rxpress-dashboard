@@ -43,7 +43,7 @@ const LoginBoxed = () => {
                 {/* Logo */}
                 <div className="mb-8 text-center">
                     <a href="/" className="inline-block text-2xl font-bold tracking-tight text-white">
-                        <span className="text-cyan-400">RX</span>press
+                        <span className="text-cyan-400">RX</span>press <span className="font-light text-slate-400">Console</span>
                     </a>
                     <p className="mt-2 text-sm text-slate-400">Sign in to your account</p>
                 </div>
