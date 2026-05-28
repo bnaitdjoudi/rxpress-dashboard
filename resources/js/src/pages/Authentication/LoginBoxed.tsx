@@ -105,9 +105,20 @@ const LoginBoxed = () => {
                     </form>
                 </div>
 
-                <p className="mt-6 text-center text-xs text-slate-500">
-                    © {new Date().getFullYear()} RXpress — Webhook reliability for WordPress
-                </p>
+                <div className="mt-6 text-center">
+                    <p className="text-sm text-slate-400">
+                        Don't have an account?{' '}
+                        <a
+                            href={`${import.meta.env.VITE_SAAS_URL}/sign-up`}
+                            className="font-medium text-cyan-400 hover:text-cyan-300 transition-colors"
+                        >
+                            Sign up
+                        </a>
+                    </p>
+                    <p className="mt-4 text-xs text-slate-500">
+                        © {new Date().getFullYear()} RXpress — Webhook reliability for WordPress
+                    </p>
+                </div>
             </div>
         </div>
     );
