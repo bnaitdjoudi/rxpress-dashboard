@@ -63,12 +63,15 @@ class SubscriptionController extends Controller
                 'price'        => $price,
                 'storage'      => $storage,
                 'bandwidth'    => $bandwidth,
-                'visits'       => $this->formatUsage($usageMap->get('visits')),
                 'hooks'        => $this->formatHooksUsage($usageMap->get('hooks'), $user->id),
                 'sites'        => $this->formatCountUsage($usageMap->get('site'), $user->sites()->count()),
-                'ftp'          => $this->formatUsage($usageMap->get('ftp')),
-                'queue'        => $this->formatUsage($usageMap->get('queue')),
                 'webhooks'     => $this->formatCountUsage($usageMap->get('webhooks'), Webhook::whereIn('site_id', $user->sites()->pluck('id'))->count()),
+                'databases'    => $this->formatUsage($usageMap->get('databases')),
+                'cron_jobs'    => $this->formatUsage($usageMap->get('cron_jobs')),
+                'aliases'      => $this->formatUsage($usageMap->get('aliases')),
+                'backups'      => $this->formatUsage($usageMap->get('backups')),
+                'retries'      => $this->formatUsage($usageMap->get('retries')),
+                'log_retention' => $this->formatUsage($usageMap->get('log_retention')),
             ]);
         }
 
