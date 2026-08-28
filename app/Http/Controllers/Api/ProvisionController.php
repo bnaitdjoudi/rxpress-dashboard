@@ -7,16 +7,12 @@ use App\Models\Plan;
 use App\Models\SubUsageOption;
 use App\Models\Subscription;
 use App\Models\User;
-use App\Services\HestiaService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 class ProvisionController extends Controller
 {
-    public function __construct(private HestiaService $hestia) {}
-
     public function provision(Request $request)
     {
         $secret = config('services.provision.secret');
@@ -39,8 +35,7 @@ class ProvisionController extends Controller
         // ── Create or update user in DB ───────────────────────────────────────
         $name = ucfirst(str_replace(['.', '_', '-'], ' ', explode('@', $email)[0]));
 
-        $isNew = false;
-        $user  = User::where('email', $email)->first();
+        $user = User::where('email', $email)->first();
 
         if ($user) {
             $user->update(['password' => Hash::make($password)]);
@@ -50,7 +45,6 @@ class ProvisionController extends Controller
                 'email'    => $email,
                 'password' => Hash::make($password),
             ]);
-            $isNew = true;
         }
 
         // ── Resolve plan ──────────────────────────────────────────────────────
@@ -95,20 +89,6 @@ class ProvisionController extends Controller
                     'plan_usage_option_limit_id' => $limit->id,
                     'used'                       => 0,
                 ]);
-            }
-        }
-
-        // ── Create HestiaCP account (new users only) ──────────────────────────
-        $hestiaUser = $user->hestia_user;
-        $package    = $plan?->pkg_hestia_name ?? 'default';
-
-        if ($isNew && $hestiaUser) {
-            try {
-                $this->hestia->addUser($hestiaUser, $password, $email, $package);
-                Log::info("[provision] HestiaCP user created: {$hestiaUser} (package: {$package})");
-            } catch (\Throwable $e) {
-                // Non-blocking: log and continue — the DB account is still valid
-                Log::error("[provision] HestiaCP user creation failed for {$hestiaUser}: " . $e->getMessage());
             }
         }
 

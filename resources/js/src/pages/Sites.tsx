@@ -20,9 +20,6 @@ const Sites = () => {
     const [deactivateModal, setDeactivateModal] = useState<{ siteId: number; siteName: string } | null>(null);
     const [deactivateLoading, setDeactivateLoading] = useState(false);
     const [statProcessing, setStatProcessing] = useState(false);
-    const [passwordModal, setPasswordModal] = useState<{ type: 'db' | 'wp'; value: string } | null>(null);
-    const [passwordLoading, setPasswordLoading] = useState<'db' | 'wp' | null>(null);
-    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         dispatch(setPageTitle('Sites'));
@@ -111,7 +108,7 @@ const Sites = () => {
                 </div>
             ) : (
                 <div className="pt-5">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 gap-6">
                         <div className="panel">
                             <div className="flex items-center justify-between mb-5">
                                 <h5 className="font-semibold text-lg dark:text-white-light">{t('site_info')}</h5>
@@ -194,116 +191,7 @@ const Sites = () => {
                                         {t('back')}
                                     </button>
                                 </div>
-
-                                <div className="border-t border-white-light dark:border-[#1b2e4b] pt-4 mt-2">
-                                    <div className="text-white-dark text-xs mb-3">{t('site_password_reset')}</div>
-                                    <div className="flex flex-wrap gap-3">
-                                        <button
-                                            type="button"
-                                            className="btn btn-outline-warning btn-sm"
-                                            disabled={passwordLoading === 'db'}
-                                            onClick={async () => {
-                                                if (!site) return;
-                                                setPasswordLoading('db');
-                                                try {
-                                                    const res = await siteApi.regenerateDbPassword(site.id);
-                                                    setPasswordModal({ type: 'db', value: res.db_pass });
-                                                } finally {
-                                                    setPasswordLoading(null);
-                                                }
-                                            }}
-                                        >
-                                            {passwordLoading === 'db' ? t('site_generating') : t('site_regen_db')}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="btn btn-outline-warning btn-sm"
-                                            disabled={passwordLoading === 'wp'}
-                                            onClick={async () => {
-                                                if (!site) return;
-                                                setPasswordLoading('wp');
-                                                try {
-                                                    const res = await siteApi.regenerateWpPassword(site.id);
-                                                    setPasswordModal({ type: 'wp', value: res.wp_admin_pass });
-                                                } finally {
-                                                    setPasswordLoading(null);
-                                                }
-                                            }}
-                                        >
-                                            {passwordLoading === 'wp' ? t('site_generating') : t('site_regen_wp')}
-                                        </button>
-                                    </div>
-                                </div>
                             </form>
-                        </div>
-
-                        <div className="panel">
-                            <div className="mb-5">
-                                <h5 className="font-semibold text-lg dark:text-white-light">{t('site_stats')}</h5>
-                            </div>
-                            <div className="space-y-5">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="rounded-md border border-white-light dark:border-[#1b2e4b] p-3">
-                                        <div className="text-white-dark text-xs mb-1">{t('site_visits_month')}</div>
-                                        <div className="text-xl font-bold text-primary">1,247</div>
-                                    </div>
-                                    <div className="rounded-md border border-white-light dark:border-[#1b2e4b] p-3">
-                                        <div className="text-white-dark text-xs mb-1">{t('site_events_hooks')}</div>
-                                        <div className="text-xl font-bold text-success">128</div>
-                                    </div>
-                                    <div className="rounded-md border border-white-light dark:border-[#1b2e4b] p-3">
-                                        <div className="text-white-dark text-xs mb-1">{t('site_ssl')}</div>
-                                        <div className="flex items-center gap-1">
-                                            <span className="badge bg-success/20 text-success rounded-full text-xs">{t('site_ssl_active')}</span>
-                                        </div>
-                                    </div>
-                                    <div className="rounded-md border border-white-light dark:border-[#1b2e4b] p-3">
-                                        <div className="text-white-dark text-xs mb-1">{t('site_uptime')}</div>
-                                        <div className="text-xl font-bold text-success">99.9%</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="panel mt-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h5 className="font-semibold text-lg dark:text-white-light">{t('site_integrations')}</h5>
-                                <p className="text-white-dark text-sm mt-1">{t('site_integrations_desc')}</p>
-                            </div>
-                            <Link to={`/sites/${id}/integrations`} className="btn btn-outline-primary">
-                                {t('site_manage_integrations')}
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {passwordModal && (
-                <div className="fixed inset-0 bg-[black]/60 z-[999] flex items-center justify-center">
-                    <div className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-md">
-                        <div className="flex items-center justify-between bg-[#fbfbfb] dark:bg-[#121c2c] px-5 py-3">
-                            <h5 className="font-bold text-base">
-                                {passwordModal.type === 'db' ? t('site_new_db_password') : t('site_new_wp_password')}
-                            </h5>
-                            <button type="button" className="text-white-dark hover:text-dark" onClick={() => { setPasswordModal(null); setCopied(false); }}>✕</button>
-                        </div>
-                        <div className="p-5">
-                            <p className="text-sm text-warning mb-4">{t('site_copy_password_now')}</p>
-                            <div className="flex items-center gap-2 bg-dark/10 dark:bg-dark/40 rounded p-3 font-mono text-sm break-all">
-                                <span className="flex-1">{passwordModal.value}</span>
-                                <button
-                                    type="button"
-                                    className="btn btn-sm btn-outline-primary shrink-0"
-                                    onClick={() => { navigator.clipboard.writeText(passwordModal.value); setCopied(true); }}
-                                >
-                                    {copied ? `✓ ${t('copied')}` : t('copy')}
-                                </button>
-                            </div>
-                            <div className="flex justify-end mt-4">
-                                <button type="button" className="btn btn-primary" onClick={() => { setPasswordModal(null); setCopied(false); }}>{t('close')}</button>
-                            </div>
                         </div>
                     </div>
                 </div>

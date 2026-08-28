@@ -41,19 +41,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/sites/{site}/stat', [SiteController::class, 'updateStat']);
     Route::get('/sites/{site}/mq-password', [SiteController::class, 'showMqPassword']);
     Route::post('/sites/{site}/mq-password/regenerate', [SiteController::class, 'regenerateMqPassword']);
-    Route::post('/sites/{site}/db-password/regenerate', [SiteController::class, 'regenerateDbPassword']);
-    Route::post('/sites/{site}/wp-password/regenerate', [SiteController::class, 'regenerateWpPassword']);
-
-    // Domaine custom (Cloudflare)
-    Route::post('/sites/{site}/custom-domain', [SiteController::class, 'addCustomDomain']);
-    Route::post('/sites/{site}/custom-domain/verify', [SiteController::class, 'verifyCustomDomain']);
-    Route::delete('/sites/{site}/custom-domain', [SiteController::class, 'removeCustomDomain']);
-
-    // WooCommerce API Keys
-    Route::get('/sites/{site}/wc-keys', [SiteController::class, 'listWcApiKeys']);
-    Route::post('/sites/{site}/wc-keys', [SiteController::class, 'createWcApiKey']);
-    Route::delete('/sites/{site}/wc-keys/{keyId}', [SiteController::class, 'deleteWcApiKey']);
-    Route::post('/sites/{site}/wc-keys/{keyId}/regenerate', [SiteController::class, 'regenerateWcApiKey']);
 
     // Webhooks
     Route::get('/sites/{site}/webhooks', [WebhookController::class, 'index']);
@@ -92,10 +79,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Profile
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::put('/profile', [ProfileController::class, 'update']);
-    Route::post('/profile/hestia-password', [ProfileController::class, 'setHestiaPassword']);
-
-    // Debug Hestia (temporaire)
-    Route::get('/hestia/debug/user', [\App\Http\Controllers\Api\HestiaDebugController::class, 'user']);
 
     // Stripe Checkout
     Route::post('/stripe/checkout', [StripeController::class, 'createCheckoutSession']);
@@ -107,3 +90,6 @@ Route::get('/prices', [\App\Http\Controllers\Api\PriceController::class, 'index'
 
 // Stripe Webhook (public — Stripe signe la requête)
 Route::post('/stripe/webhook', [StripeController::class, 'webhook']);
+
+// Ingestion d'événements depuis le plugin ReactiveWP (public — authentifié par clé API de site)
+Route::post('/events/ingest', [\App\Http\Controllers\Api\EventIngestController::class, 'store']);

@@ -104,18 +104,6 @@ const Sidebar = () => {
                                 </NavLink>
                             </li>
                             <li className="menu nav-item">
-                                <NavLink to="/api-keys" className={({ isActive }) => 'nav-link group w-full before:hidden' + (isActive || location.pathname.includes('/api-keys') ? ' active' : '')}>
-                                    <div className="flex items-center pl-8">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
-                                            <path d="M14.5 8.5C14.5 11.5376 12.0376 14 9 14C5.96243 14 3.5 11.5376 3.5 8.5C3.5 5.46243 5.96243 3 9 3C12.0376 3 14.5 5.46243 14.5 8.5Z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
-                                            <path d="M14.5 8.5L21 15V21H17V19H15V17L12.5 14.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-                                            <path d="M7.5 8.5H7.51" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none"/>
-                                        </svg>
-                                        <span className="ltr:pl-2 rtl:pr-2">{t('API Keys')}</span>
-                                    </div>
-                                </NavLink>
-                            </li>
-                            <li className="menu nav-item">
                                 <NavLink to="/wp-hooks" className={({ isActive }) => 'nav-link group w-full before:hidden' + (isActive || location.pathname.includes('/wp-hooks') ? ' active' : '')}>
                                     <div className="flex items-center pl-8">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
@@ -151,7 +139,7 @@ const Sidebar = () => {
                                 </NavLink>
                             </li>
                             <li className="menu nav-item">
-                                <NavLink to="/sites" end className={({ isActive }) => 'nav-link group w-full before:hidden' + (isActive || (location.pathname.startsWith('/sites') && !location.pathname.includes('/wp-hooks') && !location.pathname.includes('/webhooks') && !location.pathname.includes('/api-keys')) ? ' active' : '')}>
+                                <NavLink to="/sites" end className={({ isActive }) => 'nav-link group w-full before:hidden' + (isActive || (location.pathname.startsWith('/sites') && !location.pathname.includes('/wp-hooks') && !location.pathname.includes('/webhooks')) ? ' active' : '')}>
                                     <div className="flex items-center pl-8">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
                                             <path d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" stroke="currentColor" strokeWidth="1.5" fill="none" />

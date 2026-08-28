@@ -3,15 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\HestiaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
-    public function __construct(private HestiaService $hestia) {}
-
     public function show(Request $request)
     {
         $user = $request->user()->load('profile');
@@ -51,35 +48,5 @@ class ProfileController extends Controller
         $user->profile()->updateOrCreate(['user_id' => $user->id], $profileFields);
 
         return response()->json($user->load('profile'));
-    }
-
-    public function setHestiaPassword(Request $request)
-    {
-        $request->validate([
-            'password'              => 'required|string|min:8|confirmed',
-            'password_confirmation' => 'required|string',
-        ]);
-
-        $user       = $request->user();
-        $hestiaUser = $user->hestia_user;
-
-        if (!$hestiaUser) {
-            return response()->json(['message' => 'Aucun compte HestiaCP associé à cet utilisateur.'], 422);
-        }
-
-        try {
-            if (!$this->hestia->userExists($hestiaUser)) {
-                $subscription = $user->subscription()->with('plan')->first();
-                $package = $subscription?->plan?->pkg_hestia_name ?? 'default';
-                $this->hestia->addUser($hestiaUser, $request->password, $user->email, $package);
-                return response()->json(['message' => 'Compte HestiaCP créé avec succès.']);
-            }
-
-            $this->hestia->changeUserPassword($hestiaUser, $request->password);
-            return response()->json(['message' => 'Mot de passe HestiaCP mis à jour avec succès.']);
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('[ProfileController] setHestiaPassword: ' . $e->getMessage());
-            return response()->json(['message' => 'Une erreur technique est survenue. Veuillez contacter l\'administrateur.'], 500);
-        }
     }
 }

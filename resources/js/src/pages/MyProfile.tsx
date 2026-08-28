@@ -13,7 +13,7 @@ const MyProfile = () => {
     const [saving, setSaving] = useState(false);
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
-    const [activeTab, setActiveTab] = useState<'infos' | 'securite' | 'hestia'>('infos');
+    const [activeTab, setActiveTab] = useState<'infos' | 'securite'>('infos');
 
     const [form, setForm] = useState<ProfileUpdatePayload>({
         name: '',
@@ -32,12 +32,6 @@ const MyProfile = () => {
         password: '',
         password_confirmation: '',
     });
-
-    const [hestiaForm, setHestiaForm] = useState({
-        password: '',
-        password_confirmation: '',
-    });
-    const [hestiaLoading, setHestiaLoading] = useState(false);
 
     useEffect(() => {
         dispatch(setPageTitle('Mon Profil'));
@@ -79,26 +73,6 @@ const MyProfile = () => {
             setError(err?.message || t('profile_update_error'));
         } finally {
             setSaving(false);
-        }
-    };
-
-    const handleHestiaSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (hestiaForm.password !== hestiaForm.password_confirmation) {
-            setError(t('profile_pass_mismatch'));
-            return;
-        }
-        setHestiaLoading(true);
-        setSuccess('');
-        setError('');
-        try {
-            const res = await profileApi.setHestiaPassword(hestiaForm.password, hestiaForm.password_confirmation);
-            setSuccess(res.message);
-            setHestiaForm({ password: '', password_confirmation: '' });
-        } catch (err: any) {
-            setError(err?.message || t('profile_hestia_error'));
-        } finally {
-            setHestiaLoading(false);
         }
     };
 
@@ -166,7 +140,6 @@ const MyProfile = () => {
                     {([
                         { key: 'infos',    label: t('profile_tab_infos') },
                         { key: 'securite', label: t('profile_tab_security') },
-                        { key: 'hestia',   label: t('profile_tab_hestia') },
                     ] as const).map(({ key, label }) => (
                         <li key={key}>
                             <button
@@ -257,62 +230,6 @@ const MyProfile = () => {
                             </button>
                         </div>
                     </form>
-                )}
-
-                {/* Tab HestiaCP */}
-                {activeTab === 'hestia' && (
-                    <div className="panel max-w-lg">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-lg bg-warning/20 flex items-center justify-center shrink-0">
-                                <svg className="w-5 h-5 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
-                                </svg>
-                            </div>
-                            <div>
-                                <h5 className="font-semibold text-lg dark:text-white-light">{t('profile_hestia_account')}</h5>
-                                {user?.hestia_user
-                                    ? <p className="text-sm text-white-dark">{t('profile_hestia_id')} <span className="font-mono text-primary">{user.hestia_user}</span></p>
-                                    : <p className="text-sm text-danger">{t('profile_no_hestia')}</p>
-                                }
-                            </div>
-                        </div>
-
-                        {user?.hestia_user ? (
-                            <form onSubmit={handleHestiaSubmit} className="space-y-4">
-                                <div>
-                                    <label className="dark:text-white-light text-sm font-medium">{t('profile_hestia_new_pass')}</label>
-                                    <input
-                                        type="password"
-                                        className="form-input mt-1"
-                                        placeholder="••••••••"
-                                        value={hestiaForm.password}
-                                        onChange={e => setHestiaForm(p => ({ ...p, password: e.target.value }))}
-                                        required
-                                        minLength={8}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="dark:text-white-light text-sm font-medium">{t('profile_confirm_pass')}</label>
-                                    <input
-                                        type="password"
-                                        className="form-input mt-1"
-                                        placeholder="••••••••"
-                                        value={hestiaForm.password_confirmation}
-                                        onChange={e => setHestiaForm(p => ({ ...p, password_confirmation: e.target.value }))}
-                                        required
-                                        minLength={8}
-                                    />
-                                </div>
-                                <button type="submit" className="btn btn-warning" disabled={hestiaLoading}>
-                                    {hestiaLoading ? t('profile_hestia_updating') : t('profile_hestia_update_btn')}
-                                </button>
-                            </form>
-                        ) : (
-                            <p className="text-sm text-white-dark">
-                                {t('profile_hestia_auto_create')}
-                            </p>
-                        )}
-                    </div>
                 )}
 
                 {/* Tab Sécurité */}

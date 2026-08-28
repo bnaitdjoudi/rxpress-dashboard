@@ -5,15 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Webhook;
 use App\Models\WpEvent;
-use App\Services\HestiaService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class SubscriptionController extends Controller
 {
-    public function __construct(private HestiaService $hestia) {}
-
     public function index(Request $request)
     {
         $user = $request->user();
@@ -27,23 +23,6 @@ class SubscriptionController extends Controller
 
             $storage   = $this->formatUsage($usageMap->get('storage'));
             $bandwidth = $this->formatUsage($usageMap->get('bandwith'));
-
-            // Récupère les valeurs réelles depuis Hestia si activé et si l'utilisateur a un compte Hestia
-            if (config('hestia.enabled') && $user->hestia_user) {
-                try {
-                    $hestiaUser = $this->hestia->listUser($user->hestia_user);
-
-                    if ($storage !== null && isset($hestiaUser['U_DISK'])) {
-                        $storage['used'] = round((float) $hestiaUser['U_DISK'] / 1024, 2);
-                    }
-
-                    if ($bandwidth !== null && isset($hestiaUser['U_BANDWIDTH'])) {
-                        $bandwidth['used'] = round((float) $hestiaUser['U_BANDWIDTH'] / 1024, 2);
-                    }
-                } catch (\Throwable $e) {
-                    Log::warning("Hestia listUser failed for {$user->hestia_user}", ['error' => $e->getMessage()]);
-                }
-            }
 
             $price = $subscription->plan?->prices
                 ->where('active', true)

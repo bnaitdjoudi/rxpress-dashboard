@@ -15,15 +15,14 @@ const Index = () => {
     // Modal création site
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
-    const [form, setForm] = useState({ nom: '' });
+    const [form, setForm] = useState({ nom: '', nom_de_domaine: '' });
     const [formLoading, setFormLoading] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
     const [siteLimit, setSiteLimit] = useState(false);
 
-    // Modal credentials site créé
-    const [credentialsModal, setCredentialsModal] = useState<{ dbPass: string; wpAdminPass: string; siteName: string } | null>(null);
-    const [copiedDb, setCopiedDb] = useState(false);
-    const [copiedWp, setCopiedWp] = useState(false);
+    // Modal code API du site créé
+    const [credentialsModal, setCredentialsModal] = useState<{ apiKey: string; siteName: string } | null>(null);
+    const [copiedKey, setCopiedKey] = useState(false);
 
     // Modal désactivation site
     const [deactivateModal, setDeactivateModal] = useState<{ siteId: number; siteName: string } | null>(null);
@@ -74,7 +73,7 @@ const Index = () => {
         }
         setSiteLimit(false);
         setShowCreateModal(true);
-        setForm({ nom: '' });
+        setForm({ nom: '', nom_de_domaine: '' });
         setFormError(null);
     };
 
@@ -162,7 +161,6 @@ const Index = () => {
                                                     <td>
                                                         <div className="flex items-center gap-2">
                                                             <Link to={`/sites/${site.id}`} className="btn btn-primary btn-sm">Manage</Link>
-                                                            <a href={import.meta.env.VITE_HESTIA_URL} target="_blank" rel="noopener noreferrer" className="btn btn-outline-primary btn-sm">Control Panel</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -186,7 +184,7 @@ const Index = () => {
                                         setFormLoading(true);
                                         setFormError(null);
                                         try {
-                                            const payload = { nom: form.nom };
+                                            const payload = { nom: form.nom, nom_de_domaine: form.nom_de_domaine };
                                             const response = await fetch('/api/sites', {
                                                 method: 'POST',
                                                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
@@ -202,11 +200,11 @@ const Index = () => {
                                             }
                                             const json = await response.json();
                                             setShowCreateModal(false);
-                                            setForm({ nom: '' });
+                                            setForm({ nom: '', nom_de_domaine: '' });
                                             const data = await siteApi.getAll();
                                             setSites(data);
-                                            if (json?.db_pass_plain) {
-                                                setCredentialsModal({ dbPass: json.db_pass_plain, wpAdminPass: json.wp_admin_pass ?? '', siteName: json.nom });
+                                            if (json?.api_key) {
+                                                setCredentialsModal({ apiKey: json.api_key, siteName: json.nom });
                                             }
                                         } catch (e: any) {
                                             setFormError(e?.message || t('index_create_error'));
@@ -217,6 +215,18 @@ const Index = () => {
                                         <div className="mb-4">
                                             <label className="block text-sm font-medium mb-1">{t('index_site_name')}</label>
                                             <input type="text" className="form-input w-full" value={form.nom} onChange={e => setForm(f => ({ ...f, nom: e.target.value }))} required />
+                                        </div>
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium mb-1">{t('index_site_domain')}</label>
+                                            <input
+                                                type="text"
+                                                className="form-input w-full"
+                                                placeholder="https://monsite.com"
+                                                value={form.nom_de_domaine}
+                                                onChange={e => setForm(f => ({ ...f, nom_de_domaine: e.target.value }))}
+                                                required
+                                            />
+                                            <p className="text-xs text-white-dark mt-1">{t('index_site_domain_hint')}</p>
                                         </div>
                                         {formError && <div className="text-danger text-sm mb-2">{formError}</div>}
                                         <div className="flex justify-end gap-3">
@@ -321,41 +331,27 @@ const Index = () => {
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-warning mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
                                 </svg>
-                                <p className="text-sm text-white-dark">{t('index_db_warning')}</p>
+                                <p className="text-sm text-white-dark">{t('index_api_key_warning')}</p>
                             </div>
                             <p className="text-sm text-white-dark mb-2">{t('index_site_label')} <span className="font-semibold text-white">{credentialsModal.siteName}</span></p>
-                            <p className="text-sm text-white-dark mb-2">{t('index_db_pass')}</p>
+                            <p className="text-sm text-white-dark mb-2">{t('index_site_api_key')}</p>
                             <div className="flex items-center gap-2 mb-4">
-                                <code className="flex-1 bg-dark/30 rounded px-3 py-2 text-sm font-mono select-all">{credentialsModal.dbPass}</code>
+                                <code className="flex-1 bg-dark/30 rounded px-3 py-2 text-sm font-mono select-all">{credentialsModal.apiKey}</code>
                                 <button
                                     type="button"
-                                    className={`btn btn-sm ${copiedDb ? 'btn-success' : 'btn-outline-primary'}`}
+                                    className={`btn btn-sm ${copiedKey ? 'btn-success' : 'btn-outline-primary'}`}
                                     onClick={() => {
-                                        navigator.clipboard.writeText(credentialsModal.dbPass);
-                                        setCopiedDb(true);
-                                        setTimeout(() => setCopiedDb(false), 2000);
+                                        navigator.clipboard.writeText(credentialsModal.apiKey);
+                                        setCopiedKey(true);
+                                        setTimeout(() => setCopiedKey(false), 2000);
                                     }}
                                 >
-                                    {copiedDb ? t('copied') : t('copy')}
+                                    {copiedKey ? t('copied') : t('copy')}
                                 </button>
                             </div>
-                            <p className="text-sm text-white-dark mb-2">{t('index_wp_admin_pass')}</p>
-                            <div className="flex items-center gap-2 mb-5">
-                                <code className="flex-1 bg-dark/30 rounded px-3 py-2 text-sm font-mono select-all">{credentialsModal.wpAdminPass}</code>
-                                <button
-                                    type="button"
-                                    className={`btn btn-sm ${copiedWp ? 'btn-success' : 'btn-outline-primary'}`}
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(credentialsModal.wpAdminPass);
-                                        setCopiedWp(true);
-                                        setTimeout(() => setCopiedWp(false), 2000);
-                                    }}
-                                >
-                                    {copiedWp ? t('copied') : t('copy')}
-                                </button>
-                            </div>
+                            <p className="text-xs text-white-dark mb-5">{t('index_site_api_key_hint')}</p>
                             <div className="flex justify-end">
-                                <button type="button" className="btn btn-primary" onClick={() => { setCredentialsModal(null); setCopiedDb(false); setCopiedWp(false); }}>
+                                <button type="button" className="btn btn-primary" onClick={() => { setCredentialsModal(null); setCopiedKey(false); }}>
                                     {t('index_noted_passwords')}
                                 </button>
                             </div>

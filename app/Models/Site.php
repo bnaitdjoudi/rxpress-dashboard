@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string|null $db_name
  * @property string|null $db_user
  * @property string $stat
+ * @property string|null $api_key
  * @property string|null $cf_record_id
  * @property string|null $custom_domain
  * @property string|null $cf_custom_record_id
@@ -36,12 +37,17 @@ class Site extends Model
         'db_name',
         'db_user',
         'stat',
+        'api_key',
         'cf_record_id',
         'custom_domain',
         'cf_custom_record_id',
         'custom_domain_status',
         'storage_mb',
         'bandwidth_mbps',
+    ];
+
+    protected $hidden = [
+        'api_key',
     ];
 
     public function user(): BelongsTo

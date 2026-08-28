@@ -11,7 +11,6 @@ const Finance = lazy(() => import('../pages/Finance'));
 const Crypto = lazy(() => import('../pages/Crypto'));
 const Sites = lazy(() => import('../pages/Sites'));
 const Webhooks = lazy(() => import('../pages/Webhooks'));
-const ApiKeys = lazy(() => import('../pages/ApiKeys'));
 const WpHooks = lazy(() => import('../pages/WpHooks'));
 const WpEvents = lazy(() => import('../pages/WpEvents'));
 const WebhookDeliveries = lazy(() => import('../pages/WebhookDeliveries'));
@@ -156,15 +155,6 @@ const routes = [
     {
         path: '/sites/:id/webhooks',
         element: <AuthGuard><Webhooks /></AuthGuard>,
-    },
-    // api keys page
-    {
-        path: '/api-keys',
-        element: <AuthGuard><ApiKeys /></AuthGuard>,
-    },
-    {
-        path: '/sites/:id/api-keys',
-        element: <AuthGuard><ApiKeys /></AuthGuard>,
     },
     // wp hooks page
     {

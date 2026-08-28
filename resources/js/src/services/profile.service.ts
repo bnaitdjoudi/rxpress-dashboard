@@ -49,13 +49,6 @@ export const profileApi = {
             body: JSON.stringify(data),
         });
     },
-
-    setHestiaPassword: async (password: string, password_confirmation: string): Promise<{ message: string }> => {
-        return fetchApi('/profile/hestia-password', {
-            method: 'POST',
-            body: JSON.stringify({ password, password_confirmation }),
-        });
-    },
 };
 
 export default profileApi;
